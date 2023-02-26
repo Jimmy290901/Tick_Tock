@@ -3,9 +3,12 @@ const bodyParser = require("body-parser");
 const dateModule = require(__dirname + "/date.js");   //created a new module for date related operations
 const mongoose = require("mongoose");
 const _ = require("lodash");
+const dotenv = require("dotenv");
+
+dotenv.config();
 
 const app = express();
-mongoose.connect("mongodb+srv://admin-shubham:admin123@cluster0.r72es.mongodb.net/todoListDB");
+mongoose.connect(`mongodb+srv://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@cluster0.r72es.mongodb.net/todoListDB`);
 
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(express.static("public"));
@@ -34,12 +37,7 @@ const listSchema = new mongoose.Schema({
 
 const List = new mongoose.model("List", listSchema);
 
-let port = process.env.PORT;
-if (port == null || port == "") {
-  port = 3000;
-}
-
-app.listen(port, () => {
+app.listen(process.env.PORT || 3000, () => {
     console.log("Server is running at port 3000");
 })
 
@@ -49,7 +47,8 @@ app.get("/", (req,res) => {
         if (err) {
             console.log(err);
         } else {
-            res.render("list", {title:date, items: items, postTo: "/"});     //passing context to views/list.ejs file that contains EJS template
+            //passing context to views/list.ejs file that contains EJS template
+            res.render("list", {title:date, items: items, postTo: "/"});
         }
     })
 });
